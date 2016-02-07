@@ -11,6 +11,7 @@ namespace Zend\I18n\Translator;
 
 use Zend\I18n\Exception;
 use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\Exception\InvalidServiceException;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 /**
@@ -57,8 +58,12 @@ class LoaderPluginManager extends AbstractPluginManager
 {
     protected $aliases = [
         'gettext'  => Loader\Gettext::class,
+        'Gettext'  => Loader\Gettext::class,
         'ini'      => Loader\Ini::class,
-        'phparray' => Loader\PhpArray::class
+        'Ini'      => Loader\Ini::class,
+        'phparray' => Loader\PhpArray::class,
+        'phpArray' => Loader\PhpArray::class,
+        'PhpArray' => Loader\PhpArray::class
     ];
 
     protected $factories = [
@@ -84,8 +89,8 @@ class LoaderPluginManager extends AbstractPluginManager
             return;
         }
 
-        throw new Exception\RuntimeException(sprintf(
-            'Plugin of type %s is invalid; must implement %s\Loader\FileLoaderInterface or %s\Loader\RemoteLoaderInterface',
+        throw new InvalidServiceException(sprintf(
+            'Plugin of type %1$s is invalid; must implement %2$s\Loader\FileLoaderInterface or %2$s\Loader\RemoteLoaderInterface',
             (is_object($plugin) ? get_class($plugin) : gettype($plugin)),
             __NAMESPACE__
         ));
@@ -101,6 +106,10 @@ class LoaderPluginManager extends AbstractPluginManager
      */
     public function validatePlugin($instance)
     {
-        $this->validate($instance);
+        try {
+            $this->validate($instance);
+        } catch (InvalidServiceException $e) {
+            throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }

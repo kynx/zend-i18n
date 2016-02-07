@@ -19,6 +19,9 @@ class TranslatorServiceFactoryTest extends TestCase
         $slContents = [['Configuration', []]];
         $serviceLocator = $this->getMock('Zend\ServiceManager\ServiceLocatorInterface');
         $serviceLocator->expects($this->once())
+                       ->method('has')
+                       ->will($this->returnValue(true));
+        $serviceLocator->expects($this->once())
                        ->method('get')
                        ->will($this->returnValueMap($slContents));
 
